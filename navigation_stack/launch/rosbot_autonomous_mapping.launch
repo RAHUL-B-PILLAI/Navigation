@@ -1,0 +1,52 @@
+<launch>
+<!--gazebo world launch -->
+  <include file="$(find pal_gazebo_worlds)/launch/pal_gazebo.launch">
+    <arg name="world" value="tutorial_office"/>
+    <arg name="gui" value="true"/>
+    <arg name="debug" value="false"/>
+    <arg name="recording" value="false"/>
+    <arg name="extra_gz_model_path" value="$(find ari_gazebo)/models"/>
+    <arg name="extra_gz_resource_path" value="$(find ari_gazebo)"/>
+</include>
+
+<!--gazebo world launch -->
+
+<include file="$(find rosbot_description)/launch/rosbot_gazebo.launch"/>
+  <node pkg="move_base" type="move_base" name="move_base" output="screen">
+    <param name="controller_frequency" value="10.0"/>
+    <rosparam file="$(find tutorial_pkg)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find tutorial_pkg)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find tutorial_pkg)/config/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find tutorial_pkg)/config/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find tutorial_pkg)/config/trajectory_planner.yaml" command="load" />
+  </node>
+
+<!-- autonomous exploration -->
+
+<node pkg="explore_lite" type="explore" respawn="true" name="explore" output="screen">
+    <rosparam file="$(find tutorial_pkg)/config/exploration.yaml" command="load" />
+  </node>
+
+<!--gmapping -->
+
+    <node pkg="gmapping" type="slam_gmapping" name='gmapping_node' output='log'>
+        <param name="base_frame" value="base_link"/>
+        <param name="odom_frame" value="odom"/>
+        <param name="delta" value="0.01"/>
+        <param name="xmin" value="-5"/>
+        <param name="ymin" value="-5"/>
+        <param name="xmax" value="5"/>
+        <param name="ymax" value="5"/>
+        <param name="maxUrange" value="5"/>
+        <param name="map_update_interval" value="1"/>
+        <param name="linearUpdate" value="0.05"/>
+        <param name="angularUpdate" value="0.05"/>
+        <param name="temporalUpdate" value="0.1"/>
+        <param name="particles" value="100"/>
+    </node>
+
+  <include file="$(find tutorial_pkg)/launch/amcl_only.launch"/>
+
+  <node pkg="rviz" type="rviz" name="rviz"/>
+
+</launch>

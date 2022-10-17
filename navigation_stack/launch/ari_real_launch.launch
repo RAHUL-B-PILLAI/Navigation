@@ -1,0 +1,15 @@
+
+
+<launch>
+<!-- To launch rviz-->
+<node pkg="rviz" type="rviz" name="rviz" args="-d $(find navigation_stack)/config/real_robot_rviz.rviz"/>
+
+<node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" output="screen">
+    <remap from="cloud_in" to="/torso_front_camera/depth/color/points"/>
+    <remap from="scan" to="/rgbd_scan"/>
+    <param name="range_max" value="5"/>
+    <param name="target_frame" value="rgbd_laser_link"/>
+    
+</node>
+
+</launch>
